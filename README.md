@@ -10,98 +10,125 @@ ADAM é um assistente pessoal baseado em IA, focado inicialmente em auxiliar tar
 - Suporte ao desenvolvimento de software
 
 ## 🚀 Status do Projeto
-**Versão Atual:** MVP em desenvolvimento
-**Última Atualização:** [Data da última atualização]
+**Versão Atual:** MVP 0.1.0
+**Última Atualização:** 15/11/2024
 
 ### Funcionalidades Implementadas
-- [ ] Estrutura básica do frontend (Next.js)
-- [ ] Estrutura básica do backend (Node.js)
-- [ ] Integração inicial com Ollama Mistral
+- [x] Estrutura básica do frontend (Next.js)
+- [x] Estrutura básica do backend (NestJS)
+- [x] Integração com Ollama Mistral
+- [x] Chat básico funcionando
+- [x] Comunicação frontend-backend estabelecida
+- [ ] Sistema de histórico
+- [ ] Interface completa
+- [ ] Documentação da API
 
 ## 🛠 Estrutura do Projeto
 
-### adam-api (Backend) 
-plaintext
+### adam-api (Backend - NestJS)
+```plaintext
 adam-api/
 ├── src/
-│ ├── config/ # Configurações
-│ ├── controllers/ # Controladores
-│ ├── models/ # Modelos
-│ ├── routes/ # Rotas
-│ ├── services/ # Serviços
-│ └── utils/ # Utilitários
-### adam-assistente (Frontend)
-plaintext
+│   ├── ai/
+│   │   ├── ai.module.ts
+│   │   └── ai.service.ts
+│   ├── chat/
+│   │   ├── chat.controller.ts
+│   │   ├── chat.module.ts
+│   │   └── chat.service.ts
+│   └── app.module.ts
+```
+
+### adam-assistente (Frontend - Next.js)
+```plaintext
 adam-assistente/
 ├── src/
-│ ├── app/ # Páginas Next.js
-│ ├── components/ # Componentes React
-│ ├── hooks/ # Custom hooks
-│ ├── services/ # Serviços
-│ └── styles/ # Estilos
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── Chat.tsx
+│   │   └── Header.tsx
+│   ├── services/
+│   │   └── api.ts
+│   ├── hooks/
+│   └── types/
+```
 
 ## 🔧 Tecnologias Utilizadas
 
 ### Backend
-- Node.js
-- Express
-- Ollama Mistral
+- NestJS
+- Axios
+- Ollama Mistral (7B-instruct)
 
 ### Frontend
-- Next.js
+- Next.js 15.0.3
 - React
-- [Outras bibliotecas relevantes]
+- Tailwind CSS
+- Axios
 
 ## 📦 Instalação e Execução
 
 ### Pré-requisitos
-- Node.js (versão X.X.X)
+- Node.js (versão 18+)
 - npm ou yarn
 - Ollama instalado localmente
 
-### Backend
-bash
+### Instalação do Ollama
+1. Instale o Ollama seguindo as instruções em: https://ollama.ai
+2. Baixe o modelo Mistral:
+```bash
+ollama pull mistral:7b-instruct
+```
+
+### Backend (porta 3000)
+```bash
 cd adam-api
 npm install
-npm run dev
+npm run start:dev
+```
 
-### Frontend
-bash
+### Frontend (porta 3001)
+```bash
 cd adam-assistente
 npm install
-npm run dev
+npm run dev -- -p 3001
+```
 
 ## 📝 Logs de Desenvolvimento
 
-### [Data Atual]
-- Criação do README.md
-- Estruturação inicial do projeto
-- Configuração básica do Ollama Mistral
+### 15/11/2024
+- [x] Integração básica com Ollama Mistral
+- [x] Implementação do chat básico
+- [x] Configuração do CORS
+- [x] Comunicação frontend-backend
 
 ### Próximos Passos
-1. Implementar estrutura base da API
-2. Desenvolver interface de chat
-3. Configurar integração completa com Ollama
-4. Implementar sistema de logging
+1. Melhorar interface do chat
+2. Implementar sistema de histórico
+3. Adicionar header com informações do modelo
+4. Implementar tratamento de erros
+5. Adicionar documentação Swagger
 
 ## 🧪 Testes
-- [ ] Testes unitários pendentes
-- [ ] Testes de integração pendentes
-- [ ] Testes E2E pendentes
+- [ ] Testes unitários backend
+- [ ] Testes unitários frontend
+- [ ] Testes de integração
 
-## 📚 Documentação Adicional
-- [Link para documentação da API (quando disponível)]
-- [Link para documentação do frontend (quando disponível)]
+## 📚 Documentação
+- API: Em desenvolvimento
+- Frontend: Em desenvolvimento
 
 ## 🤝 Contribuição
-Este é um projeto pessoal com objetivo específico de desenvolvimento de AGI. Contribuições diretas não estão sendo aceitas no momento.
+Projeto em desenvolvimento inicial. Contribuições serão abertas em breve.
 
 ## 📄 Licença
-[Definir licença apropriada]
+MIT
 
 ## 📞 Contato
 [Suas informações de contato]
 
 ---
 
-> Este README será atualizado conforme o projeto evolui.
+> Última atualização: 15/11/2024

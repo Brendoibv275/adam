@@ -1,23 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Message } from './message.schema';
 
-@Schema({ timestamps: true })
-export class Session extends Document {
+export type SessionDocument = Session & Document;
+
+@Schema()
+export class Session {
   @Prop({ required: true })
   sessionId: string;
 
-  @Prop()
-  userId?: string;
+  @Prop({ default: Date.now })
+  createdAt: Date;
 
-  @Prop()
-  title?: string;
-
-  @Prop([{ type: Message }])
-  messages: Message[];
-
-  @Prop()
-  lastContext?: string;
+  @Prop({ type: [String], default: [] })
+  context: string[];
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session); 

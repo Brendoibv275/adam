@@ -1,92 +1,89 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
+import { sendMessage } from '../services/api';
 
-const Chat = () => {
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Array<{content: string, isUser: boolean}>>([]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+interface Message {
+  content: string;
+  role: 'user' | 'assistant';
+}
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+export default function Chat() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!message.trim()) return;
-
-    setMessages(prev => [...prev, { content: message, isUser: true }]);
+    if (!input.trim() || isLoading) return;
 
     try {
-      const response = await fetch('http://localhost:3000/chat/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: message,
-          sessionId: sessionId,
-        }),
-      });
-
-      const data = await response.json();
+      setIsLoading(true);
       
-      if (data.success) {
-        setMessages(prev => [...prev, { content: data.response, isUser: false }]);
-        if (!sessionId && data.sessionId) {
-          setSessionId(data.sessionId);
-        }
-      }
-
-      setMessage('');
+      // Adiciona mensagem do usuário
+      const userMessage: Message = { content: input, role: 'user' };
+      setMessages(prev => [...prev, userMessage]);
+      
+      // Envia para a API
+      const response = await sendMessage(input);
+      
+      // Adiciona resposta do assistente
+      const assistantMessage: Message = {
+        content: response.response,
+        role: 'assistant'
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+      
+      // Limpa o input
+      setInput('');
     } catch (error) {
       console.error('Erro:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-2xl mx-auto p-4">
-      <div className="flex-1 overflow-y-auto mb-4">
-        {messages.map((msg, index) => (
+    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-4xl mx-auto p-4">
+      {/* Área de mensagens */}
+      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+        {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'} mb-4`}
+            className={`p-4 rounded-lg ${
+              message.role === 'user'
+                ? 'bg-blue-100 ml-auto'
+                : 'bg-gray-100'
+            } max-w-[80%] whitespace-pre-wrap`}
           >
-            <div
-              className={`p-3 rounded-lg ${
-                msg.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200'
-              }`}
-            >
-              {msg.content}
-            </div>
+            {message.content}
           </div>
         ))}
-        <div ref={messagesEndRef} />
+        {isLoading && (
+          <div className="bg-gray-100 p-4 rounded-lg animate-pulse">
+            Pensando...
+          </div>
+        )}
       </div>
 
+      {/* Formulário de input */}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="flex-1 p-2 border border-gray-300 rounded"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Digite sua mensagem..."
+          className="flex-1 p-2 border rounded-lg"
+          disabled={isLoading}
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          disabled={isLoading}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 hover:bg-blue-600 transition-colors"
         >
           Enviar
         </button>
       </form>
     </div>
   );
-};
-
-export default Chat;
+}
