@@ -1,41 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { sendMessage } from '../services/api';
+import { FiSend } from 'react-icons/fi';
 
 interface Message {
   content: string;
   role: 'user' | 'assistant';
+  timestamp: Date;
 }
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Rola para a última mensagem
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    const userMessage: Message = {
+      content: input.trim(),
+      role: 'user',
+      timestamp: new Date()
+    };
+
     try {
       setIsLoading(true);
-      
-      // Adiciona mensagem do usuário
-      const userMessage: Message = { content: input, role: 'user' };
       setMessages(prev => [...prev, userMessage]);
+      setInput('');
+
+      const response = await sendMessage(userMessage.content);
       
-      // Envia para a API
-      const response = await sendMessage(input);
-      
-      // Adiciona resposta do assistente
       const assistantMessage: Message = {
         content: response.response,
-        role: 'assistant'
+        role: 'assistant',
+        timestamp: new Date()
       };
+
       setMessages(prev => [...prev, assistantMessage]);
-      
-      // Limpa o input
-      setInput('');
     } catch (error) {
       console.error('Erro:', error);
     } finally {
@@ -54,9 +67,12 @@ export default function Chat() {
               message.role === 'user'
                 ? 'bg-blue-100 ml-auto'
                 : 'bg-gray-100'
-            } max-w-[80%] whitespace-pre-wrap`}
+            } max-w-[85%]`}
           >
-            {message.content}
+            <div className="whitespace-pre-wrap">{message.content}</div>
+            <div className="text-xs text-gray-500 mt-2">
+              {message.timestamp.toLocaleTimeString()}
+            </div>
           </div>
         ))}
         {isLoading && (
@@ -64,6 +80,7 @@ export default function Chat() {
             Pensando...
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Formulário de input */}
@@ -79,9 +96,9 @@ export default function Chat() {
         <button
           type="submit"
           disabled={isLoading}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 hover:bg-blue-600 transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 hover:bg-blue-600 transition-colors flex items-center gap-2"
         >
-          Enviar
+          <FiSend /> Enviar
         </button>
       </form>
     </div>

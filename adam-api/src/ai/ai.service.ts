@@ -7,9 +7,11 @@ export class AiService {
 
   async generateResponse(message: string) {
     try {
+      const systemPrompt = "Você é um assistente em português chamado ADAM. Sempre responda em português do Brasil de forma clara e profissional.";
+      
       const response = await axios.post(`${this.ollamaUrl}/api/generate`, {
         model: 'mistral:7b-instruct',
-        prompt: message,
+        prompt: `${systemPrompt}\n\nUsuário: ${message}\n\nAssistente:`,
         stream: false,
       });
 
